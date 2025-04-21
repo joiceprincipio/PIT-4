@@ -44,7 +44,7 @@ export default function TodoList() {
   const removeTask = async (index) => {
     const taskToDelete = tasks[index];
     try {
-      await axios.delete(`${BASE_URL}${taskToDelete.id}`);
+      await axios.delete(`${BASE_URL}/${taskToDelete.id}`);
       setTasks(tasks.filter((_, i) => i !== index));
     } catch (error) {
       console.error("Error deleting task:", error.response);
@@ -77,7 +77,7 @@ export default function TodoList() {
   const saveEdit = async (taskId) => {
     const updatedTask = { title: editedTitle };
     try {
-      const response = await axios.put(`${BASE_URL}${taskId}`, updatedTask);
+      const response = await axios.put(`${BASE_URL}/${taskId}`, updatedTask);
       const updatedTasks = tasks.map((t) =>
         t.id === taskId ? response.data : t
       );
