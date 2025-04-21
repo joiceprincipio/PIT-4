@@ -57,7 +57,7 @@ export default function TodoList() {
 
     try {
       const response = await axios.put(
-        `${BASE_URL}${taskToUpdate.id}`,
+        `${BASE_URL}/${taskToUpdate.id}`,
         updatedTask
       );
       const updatedTasks = tasks.map((t, i) =>
