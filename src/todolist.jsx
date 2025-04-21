@@ -9,14 +9,16 @@ export default function TodoList() {
   const [task, setTask] = useState("");
   const [filter, setFilter] = useState("All");
   const [theme, setTheme] = useState("light");
-  const [editingTaskId, setEditingTaskId] = useState(null); // Track the task being edited
-  const [editedTitle, setEditedTitle] = useState(""); // Track the new title for the task
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editedTitle, setEditedTitle] = useState("");
+
+  const BASE_URL = "https://fastapi-for-todo.onrender.com/api/todo/";
 
   // Fetch tasks from the backend
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/todolist/");
+        const response = await axios.get(BASE_URL);
         setTasks(response.data);
       } catch (error) {
         console.error("Error fetching tasks:", error);
@@ -26,18 +28,12 @@ export default function TodoList() {
     fetchTasks();
   }, []);
 
-  // Add a new task
   const addTask = async () => {
     if (task.trim() === "") return;
 
     const newTask = { title: task, completed: false };
-    console.log("Payload being sent:", newTask); // Debugging
-
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/todolist/",
-        newTask
-      );
+      const response = await axios.post(BASE_URL, newTask);
       setTasks([...tasks, response.data]);
       setTask("");
     } catch (error) {
@@ -45,26 +41,23 @@ export default function TodoList() {
     }
   };
 
-  // Delete a task
   const removeTask = async (index) => {
     const taskToDelete = tasks[index];
-
     try {
-      await axios.delete(`http://127.0.0.1:8000/todolist/${taskToDelete.id}/`);
+      await axios.delete(`${BASE_URL}${taskToDelete.id}`);
       setTasks(tasks.filter((_, i) => i !== index));
     } catch (error) {
       console.error("Error deleting task:", error.response);
     }
   };
 
-  // Update task completion status
   const toggleCompletion = async (index) => {
     const taskToUpdate = tasks[index];
     const updatedTask = { ...taskToUpdate, completed: !taskToUpdate.completed };
 
     try {
       const response = await axios.put(
-        `http://127.0.0.1:8000/todolist/${taskToUpdate.id}/`,
+        `${BASE_URL}${taskToUpdate.id}`,
         updatedTask
       );
       const updatedTasks = tasks.map((t, i) =>
@@ -76,39 +69,31 @@ export default function TodoList() {
     }
   };
 
-  // Enable edit mode for a task
   const enableEdit = (task) => {
     setEditingTaskId(task.id);
     setEditedTitle(task.title);
   };
 
-  // Save the edited task
   const saveEdit = async (taskId) => {
     const updatedTask = { title: editedTitle };
-
     try {
-      const response = await axios.put(
-        `http://127.0.0.1:8000/todolist/${taskId}/`,
-        updatedTask
-      );
+      const response = await axios.put(`${BASE_URL}${taskId}`, updatedTask);
       const updatedTasks = tasks.map((t) =>
         t.id === taskId ? response.data : t
       );
       setTasks(updatedTasks);
-      setEditingTaskId(null); // Exit edit mode
+      setEditingTaskId(null);
       setEditedTitle("");
     } catch (error) {
       console.error("Error editing task:", error.response);
     }
   };
 
-  // Cancel editing
   const cancelEdit = () => {
     setEditingTaskId(null);
     setEditedTitle("");
   };
 
-  // Filter tasks based on the selected filter
   const filteredTasks = tasks.filter((task) => {
     if (filter === "All") return true;
     if (filter === "Completed") return task.completed;
@@ -116,14 +101,12 @@ export default function TodoList() {
     return true;
   });
 
-  // Handle Enter key press for adding a task
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       addTask();
     }
   };
 
-  // Toggle theme between light and dark
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
