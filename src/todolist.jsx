@@ -12,7 +12,7 @@ export default function TodoList() {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editedTitle, setEditedTitle] = useState("");
 
-  const BASE_URL = "https://fastapi-for-todo.onrender.com/api/todo/";
+  const BASE_URL = "https://fastapi-for-todo.onrender.com/api/todo";
 
   // Fetch tasks from the backend
   useEffect(() => {
